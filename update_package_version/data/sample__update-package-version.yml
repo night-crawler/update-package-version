@@ -1,0 +1,9 @@
+/some/unreal/but/interesting/root/path:
+  max-depth: 3
+  file-patterns:
+    - Pipfile
+    - requirements.txt
+    - requirements/*.txt
+  on-update:
+    - command 1
+    - command 2
