@@ -1,8 +1,11 @@
+import pytest
+
 from pathlib import Path
 from uuid import uuid4
 
-import pytest
 from update_package_version.cli import UpdatePackageVersionCLI
+
+pytestmark = pytest.mark.cli
 
 
 @pytest.fixture

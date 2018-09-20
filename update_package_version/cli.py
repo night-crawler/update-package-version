@@ -1,5 +1,6 @@
-import fire
 from pathlib import Path
+
+import fire
 
 
 class UpdatePackageVersionCLI:
@@ -20,11 +21,12 @@ class UpdatePackageVersionCLI:
         if self._param_config_file_path and not self._param_config_file_path.exists():
             raise FileNotFoundError(f'Specified configuration file does not exist: {config_file_path}')
 
-        # param, CWD, user home
-        self._config_file_path = \
-            self._param_config_file_path or \
-            self._cwd_config_file_path or \
-            self._user_config_file_path
+        # param -> CWD -> user home
+        self._config_file_path = None
+        for path in [self._param_config_file_path, self._cwd_config_file_path, self._user_config_file_path]:
+            if path and path.exists():
+                self._config_file_path = path
+                break
 
         self._data_dir = Path(__file__).parent / 'data'
         self._sample_config_file = self._data_dir / 'sample__update-package-version.yml'
@@ -39,16 +41,16 @@ class UpdatePackageVersionCLI:
         return [
             f'HOME: {self._user_home_path}',
             f'CWD: {self._cwd}',
-            f'Internal data dir: {self._data_dir} - exists: {self._data_dir.exists()}',
-            f'Default config file: {self._sample_config_file} - exists: {self._sample_config_file.exists()}',
-            f'Config file path: {self._config_file_path} - exists: {self._config_file_path.exists()}',
+            f'Internal data dir: {self._data_dir}',
+            f'Default config file: {self._sample_config_file}',
+            f'Config file path: {self._config_file_path}',
             f'Default max depth: {self._max_depth}',
             f'Dry run: {self._dry_run}'
         ]
 
     def copy_sample(self):
         """
-        Copies the sample configuration file to user home directory.
+        Copies the sample configuration file to user's home directory.
         """
         if self._user_config_file_path.exists():
             raise FileExistsError(f'Configuration file exists: {self._user_config_file_path}')
@@ -56,6 +58,12 @@ class UpdatePackageVersionCLI:
         self._user_config_file_path.write_bytes(
             self._sample_config_file.read_bytes()
         )
+
+    def bump(self, *args, trg: str, src: str='*'):
+        if len(args) != 1:
+            raise ValueError('You must specify exactly one package to update.')
+
+        print(self._config_file_path, args, src, trg)
 
 
 def main():

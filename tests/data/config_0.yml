@@ -1,8 +1,8 @@
 defaults:
   file-patterns:
-    - 'Pipfile': PipfileParser
-    - 'requirements.txt': RegexParser
-    - 'requirements/*.txt': RegexParser
+    - 'Pipfile': PipfileReplacer
+    - 'requirements.txt': RegexReplacer
+    - 'requirements/*.txt': RegexReplacer
   max-depth: 3
   on-update:
     - command 1
@@ -18,8 +18,9 @@ defaults:
     # non-pypi packages
     - '{package}\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
 
-origings:
-  - root: '/some/unreal/but/interesting/root/path'
+origins:
+  - name: Optional name
+    root: '/some/unreal/but/interesting/root/path'
     max-depth: 3
     match-patterns:
       - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
@@ -28,9 +29,9 @@ origings:
       - '^{package}<(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
       - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
     file-patterns:
-      - 'Pipfile': PipfileParser
-      - 'requirements.txt': RegexParser
-      - 'requirements/*.txt': RegexParser
+      - 'Pipfile': PipfileReplacer
+      - 'requirements.txt': RegexReplacer
+      - 'requirements/*.txt': RegexReplacer
     on-update:
       - command 1
       - command 2
