@@ -1,6 +1,9 @@
+import typing as t
 from pathlib import Path
 
 import fire
+
+from .config import ConfigParser, OriginConfig
 
 
 class UpdatePackageVersionCLI:
@@ -59,10 +62,22 @@ class UpdatePackageVersionCLI:
             self._sample_config_file.read_bytes()
         )
 
+    def _get_origins(self) -> t.List[OriginConfig]:
+        """
+        Reads origins from a config file if possible, otherwise it assumes we're using defaults with CWD.
+        :return: A list of OriginConfig instances
+        """
+        if self._config_file_path:
+            return ConfigParser(self._config_file_path).origins
+
+        return [ConfigParser.configure_origin(f'{self._cwd}')]
+
     def bump(self, *args, trg: str, src: str='*'):
         if len(args) != 1:
-            raise ValueError('You must specify exactly one package to update.')
+            raise ValueError('You must specify exactly one package to update')
 
+        origins = self._get_origins()
+        print(origins[0])
         print(self._config_file_path, args, src, trg)
 
 

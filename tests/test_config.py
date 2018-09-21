@@ -53,7 +53,7 @@ class ConfigParserTest:
         assert parser.origins
 
     def test_configure_origin(self):
-        o = ConfigParser.configure_origin('root')
+        o = ConfigParser.configure_origin(DATA_DIR)
         assert o.max_depth == DEFAULTS['max_depth']
         assert o.match_patterns == DEFAULTS['match_patterns']
         assert o.file_patterns == DEFAULTS['file_patterns']

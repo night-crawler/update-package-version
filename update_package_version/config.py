@@ -23,21 +23,27 @@ class OriginConfig:
             self,
             root: str,
             *,
-            name: t.Optional[str] = None,
-            max_depth: t.Optional[int] = 3,
-            match_patterns: t.Optional[t.List[str]] = None,
-            file_patterns: t.Optional[t.List[str]] = None,
+            name: str,
+            max_depth: int = 3,
+            match_patterns: t.List[str],
+            file_patterns: t.List[str],
             on_update: t.Optional[t.List[str]] = None
     ):
         if not root:
-            raise ValueError('Origin have non-empty root')
+            raise ValueError('Origin\'s root directory must not be a non-empty string')
 
-        self.root = root
+        self.root = Path(root)
         self.name = name
         self.max_depth = max_depth
         self.match_patterns = match_patterns or []
         self.file_patterns = file_patterns or []
         self.on_update = on_update or []
+
+    def __str__(self):
+        return f'Origin <{self.root}>'
+
+    def is_valid(self):
+        return self.root.exists() and self.root.is_file()
 
 
 class ConfigParser:
