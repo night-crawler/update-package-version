@@ -1,6 +1,6 @@
-import typing as t
 import pytest
 
+import typing as t
 from pathlib import Path
 
 from update_package_version.config import ConfigParser

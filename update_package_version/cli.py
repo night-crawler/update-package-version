@@ -11,7 +11,6 @@ class UpdatePackageVersionCLI:
         self,
         config_file_path: str = None,
         config_file_name: str = '.update_package_version.yml',
-        max_depth: int = 8,
         dry_run: bool = False,
     ):
         self._user_home_path = Path.home()
@@ -34,7 +33,6 @@ class UpdatePackageVersionCLI:
         self._data_dir = Path(__file__).parent / 'data'
         self._sample_config_file = self._data_dir / 'sample__update-package-version.yml'
 
-        self._max_depth = max_depth
         self._dry_run = dry_run
 
     def print_settings(self):
@@ -47,7 +45,6 @@ class UpdatePackageVersionCLI:
             f'Internal data dir: {self._data_dir}',
             f'Default config file: {self._sample_config_file}',
             f'Config file path: {self._config_file_path}',
-            f'Default max depth: {self._max_depth}',
             f'Dry run: {self._dry_run}'
         ]
 

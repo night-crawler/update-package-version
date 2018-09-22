@@ -9,12 +9,6 @@ DEFAULTS = {
         {'requirements.txt': 'RegexReplacer'},
         {'requirements/*.txt': 'RegexReplacer'}
     ],
-
-    'max_depth': 3,
-
-    'match_patterns': [
-        r'^\s*{package}==(?P<major>\d+)$',
-    ]
 }
 
 
@@ -24,8 +18,6 @@ class OriginConfig:
             root: str,
             *,
             name: str,
-            max_depth: int = 3,
-            match_patterns: t.List[str],
             file_patterns: t.List[t.Dict[str, str]],
             on_update: t.Optional[t.List[str]] = None
     ):
@@ -34,8 +26,6 @@ class OriginConfig:
 
         self.root = Path(root)
         self.name = name
-        self.max_depth = max_depth
-        self.match_patterns = match_patterns or []
         self.file_patterns = file_patterns or []
         self.on_update = on_update or []
 
@@ -75,8 +65,6 @@ class ConfigParser:
             root = origin_bundle.pop('root')
             result.append(self.configure_origin(
                 root,
-                max_depth=origin_bundle.get('max-depth'),
-                match_patterns=origin_bundle.get('match-patterns'),
                 file_patterns=origin_bundle.get('file-patterns'),
                 on_update=origin_bundle.get('on-update'),
                 defaults=self._conf.get('defaults') or DEFAULTS
@@ -88,8 +76,6 @@ class ConfigParser:
             root: str,
             *,
             name: t.Optional[str] = None,
-            max_depth: t.Optional[int] = 3,
-            match_patterns: t.Optional[t.List[str]] = None,
             file_patterns: t.Optional[t.List[t.Dict[str, str]]] = None,
             on_update: t.Optional[t.List[str]] = None,
 
@@ -101,8 +87,6 @@ class ConfigParser:
         return OriginConfig(
             root,
             name=name,
-            max_depth=max_depth or _defaults.get('max_depth'),
-            match_patterns=match_patterns or _defaults.get('match_patterns'),
             file_patterns=file_patterns or _defaults.get('file_patterns'),
             on_update=on_update or _defaults.get('on_update'),
         )
