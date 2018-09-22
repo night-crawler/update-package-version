@@ -7,8 +7,11 @@ from .config import OriginConfig
 class FileSearch:
     def __init__(self, origin_config: OriginConfig):
         self.origin_config = origin_config
+
+        # file_patterns looks like a list of pattern-replacer mappings:
+        # [ {pattern: replacer}, ... ]
         self.glob_patterns = [
-            origin_config.root.glob(file_pattern)
+            origin_config.root.glob([*file_pattern.keys()][0])
             for file_pattern
             in self.origin_config.file_patterns
         ]
@@ -26,3 +29,6 @@ class FileSearch:
                     results.append(matched_node)
 
         return list(sorted(results, key=lambda r: len(r.parts), reverse=True))
+
+    def find_matches(self):
+        pass

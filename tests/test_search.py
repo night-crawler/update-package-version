@@ -1,3 +1,4 @@
+import typing as t
 import pytest
 
 from pathlib import Path
@@ -62,10 +63,10 @@ class FileSearchTest:
                 ['config_0.yml']
         ),
     ])
-    def test_find_files(self, glob_pattern, expected_names):
+    def test_find_files(self, glob_pattern: str, expected_names: t.List[str]):
         fs = FileSearch(ConfigParser.configure_origin(
             DATA_DIR,
-            file_patterns=[glob_pattern]
+            file_patterns=[{glob_pattern: 'RegexReplacer'}]
         ))
         files = fs.find_files()
         names = [f.parts[-1] for f in files]

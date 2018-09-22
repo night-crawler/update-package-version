@@ -26,7 +26,7 @@ class OriginConfig:
             name: str,
             max_depth: int = 3,
             match_patterns: t.List[str],
-            file_patterns: t.List[str],
+            file_patterns: t.List[t.Dict[str, str]],
             on_update: t.Optional[t.List[str]] = None
     ):
         if not root:
@@ -90,7 +90,7 @@ class ConfigParser:
             name: t.Optional[str] = None,
             max_depth: t.Optional[int] = 3,
             match_patterns: t.Optional[t.List[str]] = None,
-            file_patterns: t.Optional[t.List[str]] = None,
+            file_patterns: t.Optional[t.List[t.Dict[str, str]]] = None,
             on_update: t.Optional[t.List[str]] = None,
 
             defaults: t.Optional[t.Dict[str, t.Any]] = None
