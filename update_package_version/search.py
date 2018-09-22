@@ -1,34 +1,36 @@
 import typing as t
 from pathlib import Path
 
-from .config import OriginConfig
+from .config import FilePattern, OriginConfig
+
+
+class SearchResult:
+    def __init__(self, file_pattern: FilePattern, matched_path: Path):
+        self.file_pattern = file_pattern
+        self.matched_path = matched_path
 
 
 class FileSearch:
     def __init__(self, origin_config: OriginConfig):
         self.origin_config = origin_config
 
-        # file_patterns looks like a list of pattern-replacer mappings:
-        # [ {'pattern': 'glob_pattern', 'replacer': replacer}, ... ]
-        self.glob_patterns = [
-            origin_config.root.glob(file_pattern.pattern)
-            for file_pattern
-            in self.origin_config.file_patterns
-        ]
-
-    def find_files(self) -> t.List[Path]:
+    def find_files(self) -> t.List[SearchResult]:
         """
         Searches for all file locations that match a given file patterns glob-mask.
-        Returns a file path list sorted descendingly by parts count (the longest path first).
-        :return:
+        Returns a list of SearchResult's descendingly sorted  by parts count (the longest path first).
+        :return: A list of SearchResult instances
         """
         results = []
-        for pattern in self.glob_patterns:
-            for matched_node in pattern:
-                if matched_node.is_file():
-                    results.append(matched_node)
+        for file_pattern in self.origin_config.file_patterns:
+            for matched_path in file_pattern.glob:
+                if matched_path.is_file():
+                    results.append(SearchResult(file_pattern, matched_path))
 
-        return list(sorted(results, key=lambda r: len(r.parts), reverse=True))
+        return list(sorted(results, key=lambda sr: len(sr.matched_path.parts), reverse=True))
 
-    def find_matches(self):
-        pass
+    def find(self, package_name: str, version='*'):
+        for search_result in self.find_files():
+            res = search_result.file_pattern.replacer.test(search_result.matched_path, package_name, version)
+            if res:
+                print(res)
+

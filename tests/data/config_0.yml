@@ -8,14 +8,14 @@ defaults:
 
     - pattern: 'requirements/*.txt'
       replacer: RegexReplacer
-  max-depth: 3
+
   on-update:
     - command 1
     - command 2
 
 origins:
   - root: '/some/unreal/but/interesting/root/path'
-    max-depth: 3
+
 
     file-patterns:
       - pattern: 'Pipfile'

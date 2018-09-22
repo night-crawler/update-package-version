@@ -1,12 +1,16 @@
 import typing as t
-from update_package_version.utils import DEFAULT_REPLACER_MODULE_PATH, import_from
+from pathlib import Path
+
+from update_package_version.utils import (
+    DEFAULT_REPLACER_MODULE_PATH, import_from
+)
 
 
 class BaseReplacer:
     def __init__(self, **options):
         raise NotImplementedError()
 
-    def test(self):
+    def test(self, path: t.Union[str, Path], package_name: str, version: str):
         raise NotImplementedError()
 
     def replace(self):

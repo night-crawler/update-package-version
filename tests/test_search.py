@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import pytest
 
 import typing as t
@@ -72,5 +74,21 @@ class FileSearchTest:
             }]
         ))
         files = fs.find_files()
-        names = [f.parts[-1] for f in files]
+        names = [f.matched_path.parts[-1] for f in files]
         assert names == expected_names
+
+    def test_find_regex(self):
+        fs = FileSearch(ConfigParser.configure_origin(
+            DATA_DIR,
+            file_patterns=[{
+                'pattern': '**/requirements*.txt',
+                'replacer': 'RegexReplacer',
+                'match-patterns': [
+                    r'(?P<package>{package})'
+                    r'(?P<sign>[\=\>\<]{{1,2}})'
+                    r'(?P<version>[\-\d\.]+)',
+                ]
+            }]
+        ))
+
+        res = fs.find('sample-package', version='*')

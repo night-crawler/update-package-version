@@ -1,0 +1,7 @@
+sample-package==0.0.4
+sample-package>=0.0.4
+
+ sample-package<=0.0.4
+
+sample-package>0.0.4
+            sample-package<0.0.4

@@ -8,19 +8,16 @@ defaults:
 
     - pattern: 'requirements/*.txt'
       replacer: RegexReplacer
-  max-depth: 3
+
   on-update:
     - command 1
     - command 2
 
 origins:
   - root: '/some/unreal/but/interesting/root/path'
-    max-depth: 3
-
     file-patterns:
       - pattern: 'Pipfile'
         replacer: PipfileReplacer
-
       - pattern: 'requirements.txt'
         replacer: RegexReplacer
         match-patterns:
@@ -32,10 +29,8 @@ origins:
           - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
           # non-pypi packages
           - '{package}\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-
       - pattern: 'requirements/*.txt'
         replacer: RegexReplacer
-
     on-update:
       - command 1
       - command 2
