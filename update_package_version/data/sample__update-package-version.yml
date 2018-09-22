@@ -1,36 +1,41 @@
 defaults:
   file-patterns:
-    - 'Pipfile': PipfileParser
-    - 'requirements.txt': RegexParser
-    - 'requirements/*.txt': RegexParser
+    - pattern: 'Pipfile'
+      replacer: PipfileReplacer
+
+    - pattern: 'requirements.txt'
+      replacer: RegexReplacer
+
+    - pattern: 'requirements/*.txt'
+      replacer: RegexReplacer
   max-depth: 3
   on-update:
     - command 1
     - command 2
-  match-patterns:
-    # regular pypi packages
-    - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-    - '^{package}>=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-    - '^{package}<=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-    - '^{package}<(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-    - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
 
-    # non-pypi packages
-    - '{package}\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-
-origings:
+origins:
   - root: '/some/unreal/but/interesting/root/path'
     max-depth: 3
-    match-patterns:
-      - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-      - '^{package}>=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-      - '^{package}<=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-      - '^{package}<(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-      - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+
     file-patterns:
-      - 'Pipfile': PipfileParser
-      - 'requirements.txt': RegexParser
-      - 'requirements/*.txt': RegexParser
+      - pattern: 'Pipfile'
+        replacer: PipfileReplacer
+
+      - pattern: 'requirements.txt'
+        replacer: RegexReplacer
+        match-patterns:
+          # regular pypi packages
+          - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          - '^{package}>=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          - '^{package}<=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          - '^{package}<(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          # non-pypi packages
+          - '{package}\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+
+      - pattern: 'requirements/*.txt'
+        replacer: RegexReplacer
+
     on-update:
       - command 1
       - command 2

@@ -9,9 +9,9 @@ class FileSearch:
         self.origin_config = origin_config
 
         # file_patterns looks like a list of pattern-replacer mappings:
-        # [ {pattern: replacer}, ... ]
+        # [ {'pattern': 'glob_pattern', 'replacer': replacer}, ... ]
         self.glob_patterns = [
-            origin_config.root.glob([*file_pattern.keys()][0])
+            origin_config.root.glob(file_pattern.pattern)
             for file_pattern
             in self.origin_config.file_patterns
         ]

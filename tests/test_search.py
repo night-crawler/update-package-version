@@ -30,7 +30,7 @@ pytestmark = pytest.mark.search
 
 # noinspection PyMethodMayBeStatic
 class FileSearchTest:
-    def test_init(self):
+    def test_file_search_init(self):
         assert FileSearch(ConfigParser.configure_origin(DATA_DIR))
 
     @pytest.mark.parametrize('glob_pattern,expected_names', [
@@ -66,7 +66,10 @@ class FileSearchTest:
     def test_find_files(self, glob_pattern: str, expected_names: t.List[str]):
         fs = FileSearch(ConfigParser.configure_origin(
             DATA_DIR,
-            file_patterns=[{glob_pattern: 'RegexReplacer'}]
+            file_patterns=[{
+                'pattern': glob_pattern,
+                'replacer': 'RegexReplacer',
+            }]
         ))
         files = fs.find_files()
         names = [f.parts[-1] for f in files]
