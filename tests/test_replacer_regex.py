@@ -1,6 +1,7 @@
-import pytest
+from tempfile import NamedTemporaryFile
 
-from pathlib import Path
+import pytest
+from . import conf as test_conf
 
 from update_package_version.replacers.regex import (
     PYTHON_REGULAR_PACKAGE_RX, RegexReplacer
@@ -9,15 +10,25 @@ from update_package_version.replacers.regex import (
 pytestmark = [pytest.mark.replacer, pytest.mark.regex]
 
 
-DATA_DIR = Path(__file__).absolute().parent / 'data'
-SAMPLE_FILE = DATA_DIR/'dir1/dir2/dir3/dir4'/'requirements4.txt'
+@pytest.fixture
+def sample_requirements_txt_file() -> str:
+    temp_requirements_file = NamedTemporaryFile(
+        prefix=test_conf.TMP_CONFIG_PREFIX,
+        suffix='.txt',
+        delete=False
+    )
+    temp_requirements_file.file.write(
+        test_conf.SAMPLE_REQUIREMENTS_TXT_FILE.read_text()
+    )
+    temp_requirements_file.file.flush()
+    return temp_requirements_file.file.name
 
 
 # noinspection PyMethodMayBeStatic,PyProtectedMember
 class RegexReplacerTest:
     def test_match_all(self):
         matches = RegexReplacer._match_all(
-            SAMPLE_FILE, [PYTHON_REGULAR_PACKAGE_RX],
+            test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, [PYTHON_REGULAR_PACKAGE_RX],
             'sample-package', '*'
         )
         assert matches, 'There are should be matches'
@@ -36,4 +47,16 @@ class RegexReplacerTest:
         rr = RegexReplacer(
             [PYTHON_REGULAR_PACKAGE_RX],
         )
-        assert len(rr.match(SAMPLE_FILE, 'sample-package', '0.0.1')) == 1
+        assert len(rr.match(test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, 'sample-package', '0.0.1')) == 1
+
+    def replace(self, sample_requirements_txt_file: str):
+        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        res = rr.replace(
+            sample_requirements_txt_file, 'sample-package', '*', '1.0.0'
+        )
+
+    def teardown(self):
+        pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}')
+        for file in pattern:
+            file.unlink()
+

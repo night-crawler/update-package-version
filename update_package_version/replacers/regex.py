@@ -129,3 +129,12 @@ class RegexReplacer(BaseReplacer):
             file_path, self.match_patterns,
             package_name, version
         )))
+
+    def replace(
+            self,
+            file_path: t.Union[str, Path],
+            package_name: str,
+            src_version: str,
+            trg_version: str
+    ):
+        matches = self.match(file_path, package_name, src_version)
