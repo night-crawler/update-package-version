@@ -6,38 +6,116 @@ from update_package_version.replacers.base import BaseReplacer
 
 
 DEFAULT_PYTHON_MATCH_PATTERNS = [
-    r'(?P<{package}>)==(?P<version>[\-\d\.]+)',
-
-    r'(?P<{package}>)\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$',
+    r'(?P<package>{package})==(?P<version>[\-\d\.]+)',
+    r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)',
 ]
 
 
-def match_dict(rx, line):
-    return [m.groupdict() for m in rx.finditer(line)]
+class RegexReplacerMatch:
+    def __init__(
+            self,
+            *,
+            rx: t.Pattern,
+            path: Path,
+            line_num: int,
+            line: str,
+            matches: t.List[t.Match[t.AnyStr]],
+            lookup_package_name: str,
+            lookup_package_version: str,
+    ):
+        self.rx = rx
+        self.matches = matches
+        self.line_num = line_num
+        self.line = line
+        self.path = path
+
+        self.lookup_package_name = lookup_package_name
+        self.lookup_package_version = lookup_package_version
+
+    def __str__(self):
+        return f'Match <.../{self.path.parts[-1]}:{self.line_num} :: ' \
+               f'{self.lookup_package_name}@{self.lookup_package_version}>'
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __bool__(self):
+        """
+        Tries to be truthy in case there are some matches.
+        If it has a version specified (but not an asterisk sign, which allows any version),
+        then it compares against it. In this case, at least one match should have the same version.
+        :return:
+        """
+        # print(self, self.matches)
+        for match in self.matches:
+            if not self.lookup_package_version:
+                return True
+            if self.lookup_package_version == '*':
+                return True
+
+            gd = match.groupdict()
+            if gd.get('version') == self.lookup_package_version:
+                return True
+
+        return False
 
 
 class RegexReplacer(BaseReplacer):
-    def __init__(self, match_patterns: t.Optional[t.List[str]] = None, **opts):
-        self.match_patterns = match_patterns or [] # DEFAULT_PYTHON_MATCH_PATTERNS
+    def __init__(self, match_patterns: t.Optional[t.List[t.Pattern]] = None, **opts):
+        self.match_patterns = match_patterns or DEFAULT_PYTHON_MATCH_PATTERNS
+        self._validate_match_patterns(self.match_patterns)
         self.opts = opts
 
-    def test(self, file_path: t.Union[str, Path], package_name: str, version: str):
+    @staticmethod
+    def _validate_match_patterns(match_patterns: t.List[str]):
+        for p in match_patterns:
+            try:
+                rx = re.compile(p.format(package='sample-package'))
+            except Exception as e:
+                raise RuntimeError(f'Cannot compile regex pattern: {p}')
+
+            if 'version' not in rx.groupindex:
+                # raise ValueError(f'Pattern {p} does not contain a named group with version')
+                pass
+
+    @staticmethod
+    def _match_all(
+            file_path: t.Union[str, Path],
+            patterns: t.List[str],
+            package_name: str,
+            version: str
+    ):
         path = Path(file_path)
-        
+
         interpolated_rx_list = [
             re.compile(p.format(package=re.escape(package_name)))
-            for p in self.match_patterns
+            for p in patterns
         ]
 
         results = []
-        
+
         for i, line in enumerate(path.read_text().splitlines()):
+            # we don't need empty lines
+            if not line or not line.strip():
+                continue
+
             for rx in interpolated_rx_list:
-                for match in rx.finditer(line):
-                    results.append({
-                        'path': path,
-                        'line': i,
-                        'match_dict': match.groupdict()
-                    })
+                results.append(RegexReplacerMatch(
+                    rx=rx,
+                    matches=[match for match in rx.finditer(line)],
+                    line_num=i,
+                    line=line,
+                    lookup_package_name=package_name,
+                    lookup_package_version=version,
+                    path=file_path
+                ))
 
         return results
+
+    def match(self, file_path: t.Union[str, Path], package_name: str, version: str):
+        matches = self._match_all(
+            file_path, self.match_patterns,
+            package_name, version
+        )
+
+

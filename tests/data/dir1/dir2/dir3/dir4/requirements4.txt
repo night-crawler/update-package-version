@@ -3,5 +3,6 @@ sample-package>=0.0.4
 
  sample-package<=0.0.4
 
+# some comment sample-package==0.0.1 && sample-package<=0.0.2
 sample-package>0.0.4
             sample-package<0.0.4

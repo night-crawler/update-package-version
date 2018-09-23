@@ -10,7 +10,7 @@ class BaseReplacer:
     def __init__(self, **options):
         raise NotImplementedError()
 
-    def test(self, path: t.Union[str, Path], package_name: str, version: str):
+    def match(self, path: t.Union[str, Path], package_name: str, version: str):
         raise NotImplementedError()
 
     def replace(self):
