@@ -33,4 +33,3 @@ class FileSearch:
             res = search_result.file_pattern.replacer.match(search_result.matched_path, package_name, version)
             if res:
                 print(res)
-

@@ -4,10 +4,17 @@ from pathlib import Path
 
 from update_package_version.replacers.base import BaseReplacer
 
+VERSION_SIGNS = '|'.join(re.escape(s) for s in ['==', '<=', '>=', '<', '>'])
+PYTHON_REGULAR_PACKAGE_RX = \
+    r'(?P<package>{package})' \
+    fr'(?P<sign>{VERSION_SIGNS})' \
+    r'(?P<version>[\-\d\.]+)'
+PYTHON_GIT_RX = r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+
 
 DEFAULT_PYTHON_MATCH_PATTERNS = [
-    r'(?P<package>{package})==(?P<version>[\-\d\.]+)',
-    r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)',
+    PYTHON_REGULAR_PACKAGE_RX,
+    PYTHON_GIT_RX
 ]
 
 
@@ -112,10 +119,13 @@ class RegexReplacer(BaseReplacer):
 
         return results
 
-    def match(self, file_path: t.Union[str, Path], package_name: str, version: str):
-        matches = self._match_all(
+    def match(
+            self,
+            file_path: t.Union[str, Path],
+            package_name: str,
+            version: str
+    ) -> t.List[RegexReplacerMatch]:
+        return list(filter(None, self._match_all(
             file_path, self.match_patterns,
             package_name, version
-        )
-
-
+        )))
