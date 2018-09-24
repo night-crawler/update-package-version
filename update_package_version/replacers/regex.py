@@ -2,7 +2,7 @@ import re
 import typing as t
 from pathlib import Path
 
-from update_package_version.replacers.base import BaseReplacer
+from update_package_version.replacers.base import BaseReplacer, BaseReplacerMatchBundle
 
 VERSION_SIGNS = '|'.join(re.escape(s) for s in ['==', '<=', '>=', '<', '>'])
 PYTHON_REGULAR_PACKAGE_RX = \
@@ -18,7 +18,7 @@ DEFAULT_PYTHON_MATCH_PATTERNS = [
 ]
 
 
-class RegexReplacerMatch:
+class RegexReplacerMatchBundle(BaseReplacerMatchBundle):
     def __init__(
             self,
             *,
@@ -107,7 +107,7 @@ class RegexReplacer(BaseReplacer):
                 continue
 
             for rx in interpolated_rx_list:
-                results.append(RegexReplacerMatch(
+                results.append(RegexReplacerMatchBundle(
                     rx=rx,
                     matches=[match for match in rx.finditer(line)],
                     line_num=i,
@@ -124,7 +124,7 @@ class RegexReplacer(BaseReplacer):
             file_path: t.Union[str, Path],
             package_name: str,
             version: str
-    ) -> t.List[RegexReplacerMatch]:
+    ) -> t.List[RegexReplacerMatchBundle]:
         return list(filter(None, self._match_all(
             file_path, self.match_patterns,
             package_name, version

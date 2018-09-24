@@ -6,6 +6,23 @@ from update_package_version.utils import (
 )
 
 
+class BaseReplacerMatchBundle:
+    def __init__(
+            self,
+            **kwargs
+    ):
+        raise NotImplementedError()
+
+    def __str__(self):
+        raise NotImplementedError()
+
+    def __repr__(self):
+        raise NotImplementedError()
+
+    def __bool__(self):
+        raise NotImplementedError()
+
+
 class BaseReplacer:
     def __init__(self, **options):
         raise NotImplementedError()
@@ -15,7 +32,7 @@ class BaseReplacer:
             path: t.Union[str, Path],
             package_name: str,
             version: str
-    ):
+    ) -> BaseReplacerMatchBundle:
         raise NotImplementedError()
 
     def replace(

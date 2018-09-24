@@ -1,6 +1,7 @@
 import typing as t
 from pathlib import Path
 
+from update_package_version.replacers.base import BaseReplacerMatchBundle
 from .config import FilePattern, OriginConfig
 
 
@@ -28,8 +29,12 @@ class FileSearch:
 
         return list(sorted(results, key=lambda sr: len(sr.matched_path.parts), reverse=True))
 
-    def find(self, package_name: str, version='*'):
+    def find(self, package_name: str, version='*') -> t.List[BaseReplacerMatchBundle]:
+        matches = []
         for search_result in self.find_files():
-            res = search_result.file_pattern.replacer.match(search_result.matched_path, package_name, version)
-            if res:
-                print(res)
+            matches += search_result.file_pattern.replacer.match(
+                search_result.matched_path,
+                package_name,
+                version
+            )
+        return matches

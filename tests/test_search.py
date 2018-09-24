@@ -90,3 +90,4 @@ class FileSearchTest:
         ))
 
         res = fs.find('sample-package', version='*')
+        print(res)

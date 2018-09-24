@@ -7,16 +7,16 @@ from update_package_version.replacers.base import BaseReplacer, import_replacer
 
 DEFAULTS = {
     'file_patterns': [
+        # {
+        #     'pattern': 'Pipfile',
+        #     'replacer': 'PipfileReplacer'
+        # },
         {
-            'pattern': 'Pipfile',
-            'replacer': 'PipfileReplacer'
-        },
-        {
-            'pattern': 'requirements.txt',
+            'pattern': '**/requirements.txt',
             'replacer': 'RegexReplacer'
         },
         {
-            'pattern': 'requirements/*.txt',
+            'pattern': '**/requirements/*.txt',
             'replacer': 'RegexReplacer'
         }
     ],
