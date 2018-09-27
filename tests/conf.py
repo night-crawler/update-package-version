@@ -11,4 +11,4 @@ TMP_DIR = Path(gettempdir())
 TMP_CONFIG_PREFIX = 'update-package-version-test-'
 TMP_CONFIG_SUFFIX = '.yml'
 
-SAMPLE_REQUIREMENTS_TXT_FILE = DATA_DIR/'dir1/dir2/dir3/dir4'/'requirements4.txt'
+SAMPLE_REQUIREMENTS_TXT_FILE = Path(DATA_DIR / 'dir1/dir2/dir3/dir4' / 'requirements4.txt')

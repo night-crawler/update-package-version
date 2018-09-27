@@ -18,10 +18,10 @@ def sample_requirements_txt_file() -> str:
         delete=False
     )
     temp_requirements_file.file.write(
-        test_conf.SAMPLE_REQUIREMENTS_TXT_FILE.read_text()
+        test_conf.SAMPLE_REQUIREMENTS_TXT_FILE.read_bytes()
     )
-    temp_requirements_file.file.flush()
-    return temp_requirements_file.file.name
+    temp_requirements_file.close()
+    return temp_requirements_file.name
 
 
 # noinspection PyMethodMayBeStatic,PyProtectedMember
@@ -49,14 +49,36 @@ class RegexReplacerTest:
         )
         assert len(rr.match(test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, 'sample-package', '0.0.1')) == 1
 
-    def replace(self, sample_requirements_txt_file: str):
+    def test_prepare_replace_map_wildcard(self, sample_requirements_txt_file: str):
         rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
-        res = rr.replace(
-            sample_requirements_txt_file, 'sample-package', '*', '1.0.0'
+        replace_map = rr._prepare_replace_map(
+            sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
         )
+
+        for line in replace_map.values():
+            assert '1.1.1' in line
+            assert '0.0' not in line
+
+    def test_prepare_replace_specific(self, sample_requirements_txt_file: str):
+        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        replace_map = rr._prepare_replace_map(
+            sample_requirements_txt_file, 'sample-package', '0.0.2', '1.1.1'
+        )
+
+        assert len(replace_map) == 1
+
+    def test_replace_in_file(self, sample_requirements_txt_file: str):
+        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        replaced_count = rr.replace(
+            sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
+        )
+
+        assert replaced_count
+        for line in open(sample_requirements_txt_file).readlines():
+            assert '1.1.1' in line
+            assert '0.0' not in line
 
     def teardown(self):
         pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}')
         for file in pattern:
             file.unlink()
-
