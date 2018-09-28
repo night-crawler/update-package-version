@@ -1,7 +1,6 @@
 from pathlib import Path
 from tempfile import gettempdir
 
-
 DATA_DIR = Path(__file__).absolute().parent / 'data'
 CONFIG_0 = DATA_DIR / 'config_0.yml'
 CORRUPTED_LIST_CONFIG = DATA_DIR / 'corrupted_list_config.yml'

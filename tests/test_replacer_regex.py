@@ -1,11 +1,11 @@
+import pytest
+
 from tempfile import NamedTemporaryFile
 
-import pytest
-from . import conf as test_conf
+from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX
+from update_package_version.replacers.regex import RegexReplacer
 
-from update_package_version.replacers.regex import (
-    PYTHON_REGULAR_PACKAGE_RX, RegexReplacer
-)
+from . import conf as test_conf
 
 pytestmark = [pytest.mark.replacer, pytest.mark.regex]
 

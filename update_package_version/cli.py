@@ -4,6 +4,7 @@ from pathlib import Path
 import fire
 
 from update_package_version.search import FileSearch
+
 from .config import ConfigParser, OriginConfig
 
 
@@ -80,7 +81,7 @@ class UpdatePackageVersionCLI:
             print(f'Processing origin `{origin.root}`')
             fs = FileSearch(origin)
             for match_bundle in fs.find(package_name, version=src):
-                print(f'\t{match_bundle.path}:{match_bundle.line_num}')
+                print(f'\t{match_bundle}')
 
     def bump(self, *args, trg: str, src: str='*'):
         if len(args) != 1:

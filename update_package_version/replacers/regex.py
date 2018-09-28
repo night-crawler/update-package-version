@@ -1,24 +1,13 @@
-from shutil import move
-
-from tempfile import NamedTemporaryFile
 import re
 import typing as t
 from pathlib import Path
+from shutil import move
+from tempfile import NamedTemporaryFile
 
-from update_package_version.replacers.base import BaseReplacer, BaseReplacerMatchBundle
-
-VERSION_SIGNS = '|'.join(re.escape(s) for s in ['==', '<=', '>=', '<', '>'])
-PYTHON_REGULAR_PACKAGE_RX = \
-    r'(?P<package>{package})' \
-    fr'(?P<sign>{VERSION_SIGNS})?' \
-    r'(?P<version>[\-\d\.]+)?'
-PYTHON_GIT_RX = r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-
-
-DEFAULT_PYTHON_MATCH_PATTERNS = [
-    PYTHON_REGULAR_PACKAGE_RX,
-    PYTHON_GIT_RX
-]
+from update_package_version.constants import DEFAULT_PYTHON_MATCH_PATTERNS
+from update_package_version.replacers.base import (
+    BaseReplacer, BaseReplacerMatchBundle
+)
 
 
 class RegexReplacerMatchBundle(BaseReplacerMatchBundle):

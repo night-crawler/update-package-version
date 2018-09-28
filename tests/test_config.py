@@ -2,9 +2,11 @@ import pytest
 
 from tempfile import NamedTemporaryFile, gettempdir
 from uuid import uuid4
-from . import conf as test_conf
 
-from update_package_version.config import DEFAULTS, ConfigParser
+from update_package_version.config import ConfigParser
+from update_package_version.constants import DEFAULT_PYTHON_CONFIG
+
+from . import conf as test_conf
 
 pytestmark = pytest.mark.config
 
@@ -48,7 +50,7 @@ class ConfigParserTest:
 
     def test_configure_origin(self):
         o = ConfigParser.configure_origin(test_conf.DATA_DIR)
-        assert len(o.file_patterns) == len(DEFAULTS['file_patterns'])
+        assert len(o.file_patterns) == len(DEFAULT_PYTHON_CONFIG['file_patterns'])
         assert o.on_update == []
         assert o.name is None
 

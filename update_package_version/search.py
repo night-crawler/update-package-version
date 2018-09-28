@@ -2,6 +2,7 @@ import typing as t
 from pathlib import Path
 
 from update_package_version.replacers.base import BaseReplacerMatchBundle
+
 from .config import FilePattern, OriginConfig
 
 

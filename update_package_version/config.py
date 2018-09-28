@@ -3,24 +3,8 @@ from pathlib import Path
 
 from yaml import safe_dump, safe_load
 
+from update_package_version.constants import DEFAULT_PYTHON_CONFIG
 from update_package_version.replacers.base import BaseReplacer, import_replacer
-
-DEFAULTS = {
-    'file_patterns': [
-        # {
-        #     'pattern': 'Pipfile',
-        #     'replacer': 'PipfileReplacer'
-        # },
-        {
-            'pattern': '**/requirements.txt',
-            'replacer': 'RegexReplacer'
-        },
-        {
-            'pattern': '**/requirements/*.txt',
-            'replacer': 'RegexReplacer'
-        }
-    ],
-}
 
 
 class FilePattern:
@@ -164,7 +148,7 @@ class ConfigParser:
                 root,
                 file_patterns=origin_bundle.get('file-patterns'),
                 on_update=origin_bundle.get('on-update'),
-                defaults=self._conf.get('defaults') or DEFAULTS
+                defaults=self._conf.get('defaults') or DEFAULT_PYTHON_CONFIG
             ))
         return result
 
@@ -179,7 +163,7 @@ class ConfigParser:
             defaults: t.Optional[t.Dict[str, t.Any]] = None
     ) -> OriginConfig:
 
-        _defaults = defaults or DEFAULTS
+        _defaults = defaults or DEFAULT_PYTHON_CONFIG
 
         return OriginConfig(
             root,
