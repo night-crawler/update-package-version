@@ -40,6 +40,13 @@ class RegexReplacerMatchBundle(BaseReplacerMatchBundle):
     def __repr__(self):
         return self.__str__()
 
+    @property
+    def additional_info(self):
+        lines = []
+        for m in self.matches:
+            lines.append(f'{m.re.pattern} {m.span()} -> {m.groupdict()}')
+        return lines
+
     def __bool__(self):
         """
         If a match has a version specified (but not an asterisk sign, which allows any version),
@@ -68,19 +75,23 @@ class RegexReplacer(BaseReplacer):
             exclude_patterns: t.Optional[t.List[str]] = None,
             **opts
     ):
-        self.match_patterns = match_patterns or DEFAULT_PYTHON_MATCH_PATTERNS
-        self._validate_match_patterns(self.match_patterns)
-        self.include_patterns = include_patterns
-        self.exclude_patterns = exclude_patterns
+        self.match_patterns = match_patterns or []
+        self.include_patterns = include_patterns or []
+        self.exclude_patterns = exclude_patterns or []
+
+        self._validate_patterns(self.match_patterns)
+        self._validate_patterns(self.include_patterns)
+        self._validate_patterns(self.exclude_patterns)
+
         self.opts = opts
 
     @staticmethod
-    def _validate_match_patterns(match_patterns: t.List[str]):
-        for p in match_patterns:
+    def _validate_patterns(patterns: t.List[str]):
+        for pattern in patterns:
             try:
-                rx = re.compile(p.format(package='sample-package'))
+                rx = re.compile(pattern.format(package='sample-package'))
             except Exception as e:
-                raise RuntimeError(f'Cannot compile regex pattern: {p}')
+                raise RuntimeError(f'Cannot compile regex pattern: {pattern}')
 
             if 'version' not in rx.groupindex:
                 # raise ValueError(f'Pattern {p} does not contain a named group with version')
@@ -104,7 +115,7 @@ class RegexReplacer(BaseReplacer):
     @staticmethod
     def _match_all(
             file_path: t.Union[str, Path],
-            patterns: t.List[str],
+            match_patterns: t.List[str],
             package_name: str,
             version: str,
 
@@ -113,11 +124,11 @@ class RegexReplacer(BaseReplacer):
     ):
         path = Path(file_path)
 
-        interpolated_rx_list = RegexReplacer._interpolate_patterns(patterns, package=package_name)
+        interpolated_rx_list = RegexReplacer._interpolate_patterns(match_patterns, package=package_name)
         interpolated_rx_include_list = RegexReplacer._interpolate_patterns(include_patterns or [], package=package_name)
         interpolated_rx_exclude_list = RegexReplacer._interpolate_patterns(exclude_patterns or [], package=package_name)
 
-        results = []
+        match_bundles = []
 
         for i, line in enumerate(path.read_text().splitlines(keepends=True)):
             # we don't need empty lines
@@ -143,7 +154,7 @@ class RegexReplacer(BaseReplacer):
                     if not all_excludes_are_negative:
                         continue
 
-                results.append(RegexReplacerMatchBundle(
+                match_bundles.append(RegexReplacerMatchBundle(
                     rx=rx,
                     matches=matches,
                     line_num=i,
@@ -153,7 +164,7 @@ class RegexReplacer(BaseReplacer):
                     path=file_path
                 ))
 
-        return results
+        return match_bundles
 
     def match(
             self,

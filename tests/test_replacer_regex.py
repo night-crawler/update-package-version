@@ -38,7 +38,7 @@ class RegexReplacerTest:
     def test__validate(self):
         with pytest.raises(RuntimeError):
             # this regex should fail
-            RegexReplacer._validate_match_patterns([r'(?P<{package}>)==(?P<version>[\-\d\.]+)'])
+            RegexReplacer._validate_patterns([r'(?P<{package}>)==(?P<version>[\-\d\.]+)'])
 
         # no named group
         # RegexReplacer._validate_match_patterns([r'{package}==(?P<version>[\-\d\.]+)'])

@@ -20,11 +20,30 @@ DEFAULT_PYTHON_CONFIG = {
         # },
         {
             'pattern': '**/requirements.txt',
-            'replacer': 'RegexReplacer'
+            'replacer': 'RegexReplacer',
+            'match-patterns': [PYTHON_REGULAR_PACKAGE_RX],
+            'exclude-patterns': [PYTHON_GIT_RX]
+        },
+        {
+            'pattern': '**/requirements.txt',
+            'replacer': 'RegexReplacer',
+            'match-patterns': [PYTHON_GIT_RX],
+            # 'exclude-patterns': [PYTHON_REGULAR_PACKAGE_RX]
+        },
+
+        {
+            'pattern': '**/requirements/*.txt',
+            'replacer': 'RegexReplacer',
+            'match-patterns': [PYTHON_REGULAR_PACKAGE_RX],
+            'exclude-patterns': [PYTHON_GIT_RX]
         },
         {
             'pattern': '**/requirements/*.txt',
-            'replacer': 'RegexReplacer'
-        }
+            'replacer': 'RegexReplacer',
+            'match-patterns': [PYTHON_GIT_RX],
+            # 'exclude-patterns': [PYTHON_REGULAR_PACKAGE_RX]
+        },
+
+
     ],
 }

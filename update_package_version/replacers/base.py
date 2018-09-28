@@ -22,6 +22,10 @@ class BaseReplacerMatchBundle:
     def __bool__(self):
         raise NotImplementedError()
 
+    @property
+    def additional_info(self):
+        raise NotImplementedError()
+
 
 class BaseReplacer:
     def __init__(self, **options):

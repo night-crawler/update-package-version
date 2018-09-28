@@ -85,6 +85,9 @@ class UpdatePackageVersionCLI:
             for match_bundle in fs.find(package_name, version=src):
                 print(f'\t\t{match_bundle}')
 
+                for ai in match_bundle.additional_info:
+                    print('\t\t\t', ai)
+
             print('-' * self.terminal_width)
 
     def bump(self, *args, trg: str, src: str='*'):

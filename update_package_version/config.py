@@ -16,7 +16,7 @@ class FilePattern:
         pattern: 'requirements.txt'
         replacer: RegexReplacer
         match-patterns:
-          - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+          - '^(?P<package>{package})==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
 
     """
     def __init__(
@@ -33,7 +33,7 @@ class FilePattern:
         self.replacer_options = replacer_options
 
     def __str__(self):
-        return f'FilePattern <{self.pattern}@{self.replacer_name}>'
+        return f'FilePattern <{self.pattern}@{self.replacer_name} :: {self.replacer_options}>'
 
     @property
     def glob(self):
@@ -62,7 +62,7 @@ class OriginConfig:
           - pattern: 'requirements.txt'
             replacer: RegexReplacer
             match-patterns:
-              - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+              - '^(?P<package>{package})(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
           - pattern: 'requirements/*.txt'
             replacer: RegexReplacer
         on-update:

@@ -28,7 +28,10 @@ class FileSearch:
                 if matched_path.is_file():
                     results.append(FileSearchResult(file_pattern, matched_path))
 
-        return list(sorted(results, key=lambda sr: len(sr.matched_path.parts), reverse=True))
+        return list(sorted(
+            results,
+            key=lambda sr: len(sr.matched_path.parts), reverse=True
+        ))
 
     def find(self, package_name: str, version='*') -> t.List[BaseReplacerMatchBundle]:
         matches = []
