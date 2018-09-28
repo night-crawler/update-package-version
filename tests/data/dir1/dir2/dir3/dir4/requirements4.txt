@@ -8,3 +8,5 @@ sample-package>=0.0.2
 # some comment sample-package==0.0.4 && sample-package<=0.0.5
 sample-package>0.0.6
             sample-package<0.0.7
+
+-e git+https://gitlab-ci-token:qwe@gitlab.domain.tld/path/sample-package.git@0.0.5#egg=sample-package

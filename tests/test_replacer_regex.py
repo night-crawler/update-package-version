@@ -2,7 +2,7 @@ import pytest
 
 from tempfile import NamedTemporaryFile
 
-from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX
+from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX, DEFAULT_PYTHON_MATCH_PATTERNS
 from update_package_version.replacers.regex import RegexReplacer
 
 from . import conf as test_conf
@@ -50,7 +50,10 @@ class RegexReplacerTest:
         assert len(rr.match(test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, 'sample-package', '0.0.1')) == 1
 
     def test_prepare_replace_map_wildcard(self, sample_requirements_txt_file: str):
-        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        rr = RegexReplacer(
+            [PYTHON_REGULAR_PACKAGE_RX],
+            exclude_patterns=[r'^\s*\-e.+']
+        )
         replace_map = rr._prepare_replace_map(
             sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
         )
@@ -68,17 +71,21 @@ class RegexReplacerTest:
         assert len(replace_map) == 1
 
     def test_replace_in_file(self, sample_requirements_txt_file: str):
-        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        rr = RegexReplacer(
+            DEFAULT_PYTHON_MATCH_PATTERNS,
+        )
         replaced_count = rr.replace(
             sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
         )
 
         assert replaced_count
         for line in open(sample_requirements_txt_file).readlines():
+            if not line.strip():
+                continue
             assert '1.1.1' in line
             assert '0.0' not in line
 
     def teardown(self):
-        pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}')
+        pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}*')
         for file in pattern:
             file.unlink()

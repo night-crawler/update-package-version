@@ -78,7 +78,7 @@ class OriginConfig:
             on_update: t.Optional[t.List[str]] = None
     ):
         if not root:
-            raise ValueError('Origin\'s root directory must not be a non-empty string')
+            raise ValueError('Origin\'s root directory must be a non-empty string')
 
         self.root = Path(root)
         self.name = name

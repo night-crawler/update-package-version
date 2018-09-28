@@ -1,5 +1,6 @@
 import typing as t
 from pathlib import Path
+from shutil import get_terminal_size
 
 import fire
 
@@ -13,7 +14,6 @@ class UpdatePackageVersionCLI:
         self,
         config_file_path: str = None,
         config_file_name: str = '.update_package_version.yml',
-        dry_run: bool = False,
     ):
         self._user_home_path = Path.home()
         self._cwd = Path.cwd()
@@ -35,7 +35,7 @@ class UpdatePackageVersionCLI:
         self._data_dir = Path(__file__).parent / 'data'
         self._sample_config_file = self._data_dir / 'sample__update-package-version.yml'
 
-        self._dry_run = dry_run
+        self.terminal_width, self.terminal_height = get_terminal_size((80, 20))
 
     def print_settings(self):
         """
@@ -47,7 +47,6 @@ class UpdatePackageVersionCLI:
             f'Internal data dir: {self._data_dir}',
             f'Default config file: {self._sample_config_file}',
             f'Config file path: {self._config_file_path}',
-            f'Dry run: {self._dry_run}'
         ]
 
     def copy_sample(self):
@@ -78,18 +77,30 @@ class UpdatePackageVersionCLI:
         package_name: str = args[0]
 
         for origin in self._get_origins():
-            print(f'Processing origin `{origin.root}`')
+            print(f'Searching for package \'{package_name}\'@{src} under {origin}')
+            for file_pattern in origin.file_patterns:
+                print(f'<->\t{file_pattern}')
+
             fs = FileSearch(origin)
             for match_bundle in fs.find(package_name, version=src):
-                print(f'\t{match_bundle}')
+                print(f'\t\t{match_bundle}')
+
+            print('-' * self.terminal_width)
 
     def bump(self, *args, trg: str, src: str='*'):
         if len(args) != 1:
             raise ValueError('You must specify exactly one package to update')
 
-        origins = self._get_origins()
-        print(origins[0])
-        print(self._config_file_path, args, src, trg)
+        package_name: str = args[0]
+
+        for origin in self._get_origins():
+            print(f'REPLACING package \'{package_name}\'@{src} under {origin}')
+            for file_pattern in origin.file_patterns:
+                print(f'<->\t{file_pattern}')
+
+            fs = FileSearch(origin)
+            for match_bundle in fs.find(package_name, version=src):
+                print(f'\t\t{match_bundle}')
 
 
 def main():

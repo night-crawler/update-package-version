@@ -6,6 +6,7 @@ PYTHON_REGULAR_PACKAGE_RX = \
     fr'(?P<sign>{VERSION_SIGNS})?' \
     r'(?P<version>[\-\d\.]+)?'
 PYTHON_GIT_RX = r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+PYTHON_EXCLUDE_GIT_RX = r'^\s*\-e.+git.+'
 DEFAULT_PYTHON_MATCH_PATTERNS = [
     PYTHON_REGULAR_PACKAGE_RX,
     PYTHON_GIT_RX
