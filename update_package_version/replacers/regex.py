@@ -4,7 +4,6 @@ from pathlib import Path
 from shutil import move
 from tempfile import NamedTemporaryFile
 
-from update_package_version.constants import DEFAULT_PYTHON_MATCH_PATTERNS
 from update_package_version.replacers.base import (
     BaseReplacer, BaseReplacerMatchBundle
 )
@@ -14,6 +13,7 @@ class RegexReplacerMatchBundle(BaseReplacerMatchBundle):
     def __init__(
             self,
             *,
+            replacer: 'RegexReplacer',
             rx: t.Pattern,
             path: Path,
             line_num: int,
@@ -22,6 +22,7 @@ class RegexReplacerMatchBundle(BaseReplacerMatchBundle):
             lookup_package_name: str,
             lookup_package_version: str,
     ):
+        self.replacer = replacer
         self.rx = rx
 
         # we expect here to get a natural order of matches that complies with text occurrences as they go
@@ -112,21 +113,18 @@ class RegexReplacer(BaseReplacer):
         for rx in patterns:
             yield rx, [m for m in rx.finditer(line)]
 
-    @staticmethod
+    # @staticmethod
     def _match_all(
+            self,
             file_path: t.Union[str, Path],
-            match_patterns: t.List[str],
             package_name: str,
             version: str,
-
-            include_patterns: t.List[str] = None,
-            exclude_patterns: t.List[str] = None,
     ):
         path = Path(file_path)
 
-        interpolated_rx_list = RegexReplacer._interpolate_patterns(match_patterns, package=package_name)
-        interpolated_rx_include_list = RegexReplacer._interpolate_patterns(include_patterns or [], package=package_name)
-        interpolated_rx_exclude_list = RegexReplacer._interpolate_patterns(exclude_patterns or [], package=package_name)
+        interpolated_rx_list = RegexReplacer._interpolate_patterns(self.match_patterns, package=package_name)
+        interpolated_rx_include_list = RegexReplacer._interpolate_patterns(self.include_patterns, package=package_name)
+        interpolated_rx_exclude_list = RegexReplacer._interpolate_patterns(self.exclude_patterns, package=package_name)
 
         match_bundles = []
 
@@ -155,6 +153,7 @@ class RegexReplacer(BaseReplacer):
                         continue
 
                 match_bundles.append(RegexReplacerMatchBundle(
+                    replacer=self,
                     rx=rx,
                     matches=matches,
                     line_num=i,
@@ -173,23 +172,17 @@ class RegexReplacer(BaseReplacer):
             version: str
     ) -> t.List[RegexReplacerMatchBundle]:
         return list(filter(None, self._match_all(
-            file_path, self.match_patterns,
+            file_path,
             package_name, version,
-            include_patterns=self.include_patterns,
-            exclude_patterns=self.exclude_patterns,
-            **self.opts
         )))
 
+    @staticmethod
     def _prepare_replace_map(
-            self,
-            file_path: t.Union[str, Path],
-            package_name: str,
-            src_version: str,
+            match_bundles: t.List[RegexReplacerMatchBundle],
             trg_version: str
     ) -> t.Dict[int, str]:
         replace_map = {}
 
-        match_bundles = self.match(file_path, package_name, src_version)
         for match_bundle in match_bundles:
             line = match_bundle.line
             # have to reverse matches since we don't want to mess up the lower span string indexes
@@ -218,7 +211,8 @@ class RegexReplacer(BaseReplacer):
         trg_version: str
     ):
         file_path = Path(file_path)
-        replace_map = self._prepare_replace_map(file_path, package_name, src_version, trg_version)
+        match_bundles = self.match(file_path, package_name, src_version)
+        replace_map = self._prepare_replace_map(match_bundles, trg_version)
         tmp_file = NamedTemporaryFile(prefix=file_path.name, suffix='.replace', delete=False)
 
         for i, line in enumerate(file_path.read_text().splitlines(keepends=True)):
@@ -226,7 +220,6 @@ class RegexReplacer(BaseReplacer):
                 actual_line = replace_map[i]
             else:
                 actual_line = line
-            print(i, actual_line)
             tmp_file.write(actual_line.encode())
 
         tmp_file.close()

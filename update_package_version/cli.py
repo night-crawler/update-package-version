@@ -90,7 +90,7 @@ class UpdatePackageVersionCLI:
 
             print('-' * self.terminal_width)
 
-    def bump(self, *args, trg: str, src: str='*'):
+    def update(self, *args, trg: str, src: str='*'):
         if len(args) != 1:
             raise ValueError('You must specify exactly one package to update')
 

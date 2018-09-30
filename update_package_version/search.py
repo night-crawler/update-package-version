@@ -35,9 +35,9 @@ class FileSearch:
 
     def find(self, package_name: str, version='*') -> t.List[BaseReplacerMatchBundle]:
         matches = []
-        for search_result in self.find_files():
-            matches += search_result.file_pattern.replacer.match(
-                search_result.matched_path,
+        for file_search_result in self.find_files():
+            matches += file_search_result.file_pattern.replacer.match(
+                file_search_result.matched_path,
                 package_name,
                 version
             )

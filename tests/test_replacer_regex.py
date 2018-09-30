@@ -27,8 +27,8 @@ def sample_requirements_txt_file() -> str:
 # noinspection PyMethodMayBeStatic,PyProtectedMember
 class RegexReplacerTest:
     def test_match_all(self):
-        matches = RegexReplacer._match_all(
-            test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, [PYTHON_REGULAR_PACKAGE_RX],
+        matches = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])._match_all(
+            test_conf.SAMPLE_REQUIREMENTS_TXT_FILE,
             'sample-package', '*'
         )
         assert matches, 'There are should be matches'
@@ -54,9 +54,8 @@ class RegexReplacerTest:
             [PYTHON_REGULAR_PACKAGE_RX],
             exclude_patterns=[r'^\s*\-e.+']
         )
-        replace_map = rr._prepare_replace_map(
-            sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
-        )
+        match_bundles = rr.match(sample_requirements_txt_file, 'sample-package', '*')
+        replace_map = rr._prepare_replace_map(match_bundles, '1.1.1')
 
         for line in replace_map.values():
             assert '1.1.1' in line
@@ -64,9 +63,9 @@ class RegexReplacerTest:
 
     def test_prepare_replace_specific(self, sample_requirements_txt_file: str):
         rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
-        replace_map = rr._prepare_replace_map(
-            sample_requirements_txt_file, 'sample-package', '0.0.2', '1.1.1'
-        )
+
+        match_bundles = rr.match(sample_requirements_txt_file, 'sample-package', '0.0.2')
+        replace_map = rr._prepare_replace_map(match_bundles, '1.1.1')
 
         assert len(replace_map) == 1
 
