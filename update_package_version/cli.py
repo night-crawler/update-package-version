@@ -102,7 +102,7 @@ class UpdatePackageVersionCLI:
                 print(f'<->\t{file_pattern}')
 
             fs = FileSearch(origin)
-            for match_bundle in fs.find(package_name, version=src):
+            for match_bundle in fs.replace(package_name, src_version=src, trg_version=trg):
                 print(f'\t\t{match_bundle}')
 
 
