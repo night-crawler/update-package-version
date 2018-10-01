@@ -19,7 +19,7 @@ class FileSearch:
     def find_files(self) -> t.List[FileSearchResult]:
         """
         Searches for all file locations that match a given file patterns glob-mask.
-        Returns a list of FileSearchResult's descendingly sorted  by parts count (the longest path first).
+        Returns a list of FileSearchResult's descendingly sorted by parts count (the longest path first).
         :return: A list of FileSearchResult instances
         """
         results = []
@@ -42,3 +42,18 @@ class FileSearch:
                 version
             )
         return matches
+
+    def replace(
+            self,
+            package_name: str,
+            src_version: str,
+            trg_version: str) -> t.List:
+        replacements = []
+
+        for file_search_result in self.find_files():
+            replacements += file_search_result.file_pattern.replacer.replace(
+                file_search_result.matched_path,
+                package_name,
+                src_version, trg_version
+            )
+        return replacements

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from update_package_version.config import ConfigParser
 from update_package_version.search import FileSearch
-
+from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX
 DATA_DIR = Path(__file__).absolute().parent / 'data'
 
 pytestmark = pytest.mark.search
@@ -81,13 +81,8 @@ class FileSearchTest:
             file_patterns=[{
                 'pattern': '**/requirements*.txt',
                 'replacer': 'RegexReplacer',
-                'match-patterns': [
-                    r'(?P<package>{package})'
-                    r'(?P<sign>[\=\>\<]{{1,2}})'
-                    r'(?P<version>[\-\d\.]+)',
-                ]
+                'match-patterns': [PYTHON_REGULAR_PACKAGE_RX]
             }]
         ))
 
-        res = fs.find('sample-package', version='*')
-        print(res)
+        assert fs.find('sample-package', version='*')

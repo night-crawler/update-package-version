@@ -9,6 +9,25 @@ from update_package_version.replacers.base import (
 )
 
 
+class LineReplacement:
+    def __init__(
+            self, *,
+            left: str, right: str,
+            line_num: int,
+            path: Path,
+    ):
+        self.left = left
+        self.right = right
+        self.line_num = line_num
+        self.path = path
+
+    def __str__(self):
+        return f'{self.path}:{self.line_num} {self.left} -> {self.right}'
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class RegexReplacerMatchBundle(BaseReplacerMatchBundle):
     def __init__(
             self,
@@ -179,12 +198,11 @@ class RegexReplacer(BaseReplacer):
     @staticmethod
     def _prepare_replace_map(
             match_bundles: t.List[RegexReplacerMatchBundle],
-            trg_version: str
-    ) -> t.Dict[int, str]:
+            trg_version: str) -> t.Dict[int, LineReplacement]:
         replace_map = {}
 
         for match_bundle in match_bundles:
-            line = match_bundle.line
+            orig_line = line = match_bundle.line
             # have to reverse matches since we don't want to mess up the lower span string indexes
             for match in reversed(match_bundle.matches):
                 match_span, version_span = match.span(), match.span('version')
@@ -199,16 +217,21 @@ class RegexReplacer(BaseReplacer):
                 l, r = line[:version_span[0]], line[version_span[1]:]
                 line = f'{l}{trg_version}{r}'
 
-            replace_map[match_bundle.line_num] = line
+            replace_map[match_bundle.line_num] = LineReplacement(
+                left=orig_line,
+                right=line,
+                line_num=match_bundle.line_num,
+                path=match_bundle.path,
+            )
 
         return replace_map
 
     def replace(
-        self,
-        file_path: t.Union[str, Path],
-        package_name: str,
-        src_version: str,
-        trg_version: str
+            self,
+            file_path: t.Union[str, Path],
+            package_name: str,
+            src_version: str,
+            trg_version: str
     ):
         file_path = Path(file_path)
         match_bundles = self.match(file_path, package_name, src_version)
@@ -217,7 +240,7 @@ class RegexReplacer(BaseReplacer):
 
         for i, line in enumerate(file_path.read_text().splitlines(keepends=True)):
             if i in replace_map:
-                actual_line = replace_map[i]
+                actual_line = replace_map[i].right
             else:
                 actual_line = line
             tmp_file.write(actual_line.encode())
@@ -225,4 +248,4 @@ class RegexReplacer(BaseReplacer):
         tmp_file.close()
         move(tmp_file.name, file_path)
 
-        return len(replace_map)
+        return replace_map.values()

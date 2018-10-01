@@ -57,9 +57,9 @@ class RegexReplacerTest:
         match_bundles = rr.match(sample_requirements_txt_file, 'sample-package', '*')
         replace_map = rr._prepare_replace_map(match_bundles, '1.1.1')
 
-        for line in replace_map.values():
-            assert '1.1.1' in line
-            assert '0.0' not in line
+        for replacement in replace_map.values():
+            assert '1.1.1' in replacement.right
+            assert '0.0' not in replacement.right
 
     def test_prepare_replace_specific(self, sample_requirements_txt_file: str):
         rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
