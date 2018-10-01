@@ -5,19 +5,19 @@ from shutil import move
 from tempfile import NamedTemporaryFile
 
 from update_package_version.replacers.base import (
-    BaseReplacer, BaseReplacerMatchBundle
+    BaseReplacementResult, BaseReplacer, BaseReplacerMatchBundle
 )
 
 
-class LineReplacement:
+class LineReplacement(BaseReplacementResult):
     def __init__(
             self, *,
             left: str, right: str,
             line_num: int,
             path: Path,
     ):
-        self.left = left
-        self.right = right
+        self.left = left.strip()
+        self.right = right.strip()
         self.line_num = line_num
         self.path = path
 
@@ -232,7 +232,7 @@ class RegexReplacer(BaseReplacer):
             package_name: str,
             src_version: str,
             trg_version: str
-    ):
+    ) -> t.List[LineReplacement]:
         file_path = Path(file_path)
         match_bundles = self.match(file_path, package_name, src_version)
         replace_map = self._prepare_replace_map(match_bundles, trg_version)

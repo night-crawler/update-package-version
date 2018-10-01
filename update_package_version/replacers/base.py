@@ -6,6 +6,10 @@ from update_package_version.utils import (
 )
 
 
+class BaseReplacementResult:
+    pass
+
+
 class BaseReplacerMatchBundle:
     def __init__(
             self,
@@ -45,7 +49,7 @@ class BaseReplacer:
         package_name: str,
         src_version: str,
         trg_version: str
-    ):
+    ) -> t.List[BaseReplacementResult]:
         raise NotImplementedError()
 
 

@@ -1,7 +1,9 @@
 import typing as t
 from pathlib import Path
 
-from update_package_version.replacers.base import BaseReplacerMatchBundle
+from update_package_version.replacers.base import (
+    BaseReplacementResult, BaseReplacerMatchBundle
+)
 
 from .config import FilePattern, OriginConfig
 
@@ -47,7 +49,7 @@ class FileSearch:
             self,
             package_name: str,
             src_version: str,
-            trg_version: str) -> t.List:
+            trg_version: str) -> t.List[BaseReplacementResult]:
         replacements = []
 
         for file_search_result in self.find_files():

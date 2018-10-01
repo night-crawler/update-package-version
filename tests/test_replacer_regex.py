@@ -1,8 +1,11 @@
 import pytest
 
+from shutil import rmtree
 from tempfile import NamedTemporaryFile
 
-from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX, DEFAULT_PYTHON_MATCH_PATTERNS
+from update_package_version.constants import (
+    PYTHON_REQUIREMENTS_MATCH_PATTERNS, PYTHON_REQUIREMENTS_PACKAGE_RX
+)
 from update_package_version.replacers.regex import RegexReplacer
 
 from . import conf as test_conf
@@ -27,7 +30,7 @@ def sample_requirements_txt_file() -> str:
 # noinspection PyMethodMayBeStatic,PyProtectedMember
 class RegexReplacerTest:
     def test_match_all(self):
-        matches = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])._match_all(
+        matches = RegexReplacer([PYTHON_REQUIREMENTS_PACKAGE_RX])._match_all(
             test_conf.SAMPLE_REQUIREMENTS_TXT_FILE,
             'sample-package', '*'
         )
@@ -45,13 +48,13 @@ class RegexReplacerTest:
 
     def test_match(self):
         rr = RegexReplacer(
-            [PYTHON_REGULAR_PACKAGE_RX],
+            [PYTHON_REQUIREMENTS_PACKAGE_RX],
         )
         assert len(rr.match(test_conf.SAMPLE_REQUIREMENTS_TXT_FILE, 'sample-package', '0.0.1')) == 1
 
     def test_prepare_replace_map_wildcard(self, sample_requirements_txt_file: str):
         rr = RegexReplacer(
-            [PYTHON_REGULAR_PACKAGE_RX],
+            [PYTHON_REQUIREMENTS_PACKAGE_RX],
             exclude_patterns=[r'^\s*\-e.+']
         )
         match_bundles = rr.match(sample_requirements_txt_file, 'sample-package', '*')
@@ -62,7 +65,7 @@ class RegexReplacerTest:
             assert '0.0' not in replacement.right
 
     def test_prepare_replace_specific(self, sample_requirements_txt_file: str):
-        rr = RegexReplacer([PYTHON_REGULAR_PACKAGE_RX])
+        rr = RegexReplacer([PYTHON_REQUIREMENTS_PACKAGE_RX])
 
         match_bundles = rr.match(sample_requirements_txt_file, 'sample-package', '0.0.2')
         replace_map = rr._prepare_replace_map(match_bundles, '1.1.1')
@@ -71,7 +74,7 @@ class RegexReplacerTest:
 
     def test_replace_in_file(self, sample_requirements_txt_file: str):
         rr = RegexReplacer(
-            DEFAULT_PYTHON_MATCH_PATTERNS,
+            PYTHON_REQUIREMENTS_MATCH_PATTERNS,
         )
         replaced_count = rr.replace(
             sample_requirements_txt_file, 'sample-package', '*', '1.1.1'
@@ -86,5 +89,8 @@ class RegexReplacerTest:
 
     def teardown(self):
         pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}*')
-        for file in pattern:
-            file.unlink()
+        for path in pattern:
+            if path.is_file():
+                path.unlink()
+            else:
+                rmtree(path)

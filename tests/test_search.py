@@ -1,12 +1,14 @@
 import pytest
 
 import typing as t
-from pathlib import Path
+from shutil import copytree, rmtree
+from uuid import uuid4
+
+from tests.conf import DATA_DIR, TMP_CONFIG_PREFIX, TMP_DIR
 
 from update_package_version.config import ConfigParser
+from update_package_version.constants import PYTHON_REQUIREMENTS_PACKAGE_RX, PYTHON_EXCLUDE_GIT_RX, PYTHON_EXCLUDE_HASH_COMMENT
 from update_package_version.search import FileSearch
-from update_package_version.constants import PYTHON_REGULAR_PACKAGE_RX
-DATA_DIR = Path(__file__).absolute().parent / 'data'
 
 pytestmark = pytest.mark.search
 
@@ -81,8 +83,39 @@ class FileSearchTest:
             file_patterns=[{
                 'pattern': '**/requirements*.txt',
                 'replacer': 'RegexReplacer',
-                'match-patterns': [PYTHON_REGULAR_PACKAGE_RX]
+                'match-patterns': [PYTHON_REQUIREMENTS_PACKAGE_RX]
             }]
         ))
 
         assert fs.find('sample-package', version='*')
+
+    def test_search_replace_regex(self):
+        tmp_dir = TMP_DIR / f'{TMP_CONFIG_PREFIX}{uuid4().hex}'
+        copytree(DATA_DIR, tmp_dir)
+        assert tmp_dir.exists()
+
+        fs = FileSearch(ConfigParser.configure_origin(
+            tmp_dir,
+            file_patterns=[{
+                'pattern': '**/requirements*.txt',
+                'replacer': 'RegexReplacer',
+                'match-patterns': [PYTHON_REQUIREMENTS_PACKAGE_RX],
+                'exclude-patterns': [PYTHON_EXCLUDE_GIT_RX, PYTHON_EXCLUDE_HASH_COMMENT]
+            }]
+        ))
+
+        replacement_results = fs.replace('sample-package', '*', '1.1.1')
+        assert replacement_results
+
+        for res in replacement_results:
+            assert '1.1.1' in str(res)
+            assert '#' not in str(res)
+            assert '.git' not in str(res)
+
+    def teardown(self):
+        pattern = TMP_DIR.glob(f'{TMP_CONFIG_PREFIX}*')
+        for path in pattern:
+            if path.is_file():
+                path.unlink()
+            else:
+                rmtree(path)
