@@ -16,13 +16,14 @@ class LineReplacement(BaseReplacementResult):
             line_num: int,
             path: Path,
     ):
-        self.left = left.strip()
-        self.right = right.strip()
+        # must not trim spaces here
+        self.left = left
+        self.right = right
         self.line_num = line_num
         self.path = path
 
     def __str__(self):
-        return f'{self.path}:{self.line_num} {self.left} -> {self.right}'
+        return f'{self.path}:{self.line_num} {self.left.strip()} -> {self.right.strip()}'
 
     def __repr__(self):
         return self.__str__()
@@ -138,7 +139,7 @@ class RegexReplacer(BaseReplacer):
             file_path: t.Union[str, Path],
             package_name: str,
             version: str,
-    ):
+    ) -> t.List[RegexReplacerMatchBundle]:
         path = Path(file_path)
 
         interpolated_rx_list = RegexReplacer._interpolate_patterns(self.match_patterns, package=package_name)

@@ -40,7 +40,7 @@ class BaseReplacer:
             path: t.Union[str, Path],
             package_name: str,
             version: str
-    ) -> BaseReplacerMatchBundle:
+    ) -> t.List[BaseReplacerMatchBundle]:
         raise NotImplementedError()
 
     def replace(

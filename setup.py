@@ -30,5 +30,5 @@ setup(
         'License :: OSI Approved :: MIT License',
     ],
     python_requires='>=3.6',
-    install_requires=['fire', 'pyyaml']
+    install_requires=['fire', 'pyyaml', 'toml']
 )

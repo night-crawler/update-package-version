@@ -15,10 +15,10 @@ PYTHON_REQUIREMENTS_MATCH_PATTERNS = [
 
 DEFAULT_PYTHON_CONFIG = {
     'file_patterns': [
-        # {
-        #     'pattern': 'Pipfile',
-        #     'replacer': 'PipfileReplacer'
-        # },
+        {
+            'pattern': '**/Pipfile',
+            'replacer': 'PipfileReplacer'
+        },
         {
             'pattern': '**/requirements.txt',
             'replacer': 'RegexReplacer',
