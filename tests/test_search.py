@@ -7,7 +7,10 @@ from uuid import uuid4
 from tests.conf import DATA_DIR, TMP_CONFIG_PREFIX, TMP_DIR
 
 from update_package_version.config import ConfigParser
-from update_package_version.constants import PYTHON_REQUIREMENTS_PACKAGE_RX, PYTHON_EXCLUDE_GIT_RX, PYTHON_EXCLUDE_HASH_COMMENT
+from update_package_version.constants import (
+    PYTHON_EXCLUDE_GIT_RX, PYTHON_EXCLUDE_HASH_COMMENT,
+    PYTHON_REQUIREMENTS_PACKAGE_RX
+)
 from update_package_version.search import FileSearch
 
 pytestmark = pytest.mark.search

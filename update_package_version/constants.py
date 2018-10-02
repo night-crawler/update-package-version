@@ -1,9 +1,10 @@
 import re
 
-VERSION_SIGNS = '|'.join(re.escape(s) for s in ['==', '<=', '>=', '<', '>'])
+VERSION_SIGNS = ['==', '<=', '>=', '<', '>']
+VERSION_SIGNS_RX = '|'.join(re.escape(s) for s in VERSION_SIGNS)
 PYTHON_REQUIREMENTS_PACKAGE_RX = \
     r'(?P<package>{package})' \
-    fr'(?P<sign>{VERSION_SIGNS})?' \
+    fr'(?P<sign>{VERSION_SIGNS_RX})?' \
     r'(?P<version>[\-\d\.]+)?'
 PYTHON_REQUIREMENTS_GIT_RX = r'(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
 PYTHON_EXCLUDE_GIT_RX = r'^\s*\-e.+git.+'

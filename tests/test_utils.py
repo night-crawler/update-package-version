@@ -1,6 +1,6 @@
 import pytest
 
-from update_package_version.replacers.base import import_replacer
+from update_package_version.base import import_replacer
 from update_package_version.utils import import_from
 
 pytestmark = pytest.mark.config

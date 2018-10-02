@@ -1,7 +1,7 @@
 import typing as t
 from pathlib import Path
 
-from update_package_version.replacers.base import (
+from update_package_version.base import (
     BaseReplacementResult, BaseReplacerMatchBundle
 )
 

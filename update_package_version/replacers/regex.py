@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import move
 from tempfile import NamedTemporaryFile
 
-from update_package_version.replacers.base import (
+from update_package_version.base import (
     BaseReplacementResult, BaseReplacer, BaseReplacerMatchBundle
 )
 
@@ -233,7 +233,7 @@ class RegexReplacer(BaseReplacer):
             package_name: str,
             src_version: str,
             trg_version: str
-    ) -> t.List[LineReplacement]:
+    ) -> t.ValuesView[LineReplacement]:
         file_path = Path(file_path)
         match_bundles = self.match(file_path, package_name, src_version)
         replace_map = self._prepare_replace_map(match_bundles, trg_version)

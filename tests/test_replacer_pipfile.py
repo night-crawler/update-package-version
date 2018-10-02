@@ -1,32 +1,50 @@
 import pytest
 
-from tempfile import NamedTemporaryFile
-from update_package_version.replacers.pipfile import PipfileReplacer
+from update_package_version.replacers.pipfile import (
+    PipfilePackage, PipfileParser, PipfileReplacer
+)
 
 from . import conf as test_conf
 
 pytestmark = [pytest.mark.replacer, pytest.mark.pipfile]
 
 
-@pytest.fixture
-def sample_requirements_txt_file() -> str:
-    temp_requirements_file = NamedTemporaryFile(
-        prefix=test_conf.TMP_CONFIG_PREFIX,
-        suffix='.txt',
-        delete=False
-    )
-    temp_requirements_file.file.write(
-        test_conf.SAMPLE_REQUIREMENTS_TXT_FILE.read_bytes()
-    )
-    temp_requirements_file.close()
-    return temp_requirements_file.name
+# noinspection PyMethodMayBeStatic,PyProtectedMember
+class PipfilePackagePTest:
+    pytestmark = [pytest.mark.parser, pytest.mark.pipfile, pytest.mark.package]
+
+    def test_init(self):
+        assert PipfilePackage('sample-package', 'dev-packages')
+        assert PipfilePackage('sample', version='*', section='dev-packages')
+        assert str(PipfileParser('sample'))
 
 
 # noinspection PyMethodMayBeStatic,PyProtectedMember
-class RegexReplacerTest:
+class PipfileParserTest:
+    pytestmark = [pytest.mark.parser, pytest.mark.pipfile]
+
+    def test_parse(self):
+        parser = PipfileParser(test_conf.PIPFILE_CONFIG)
+        assert parser._parse()
+
+    def test_packages(self):
+        parser = PipfileParser(test_conf.PIPFILE_CONFIG)
+        assert parser.packages
+        assert parser.dev_packages
+
+    def test_filter(self):
+        parser = PipfileParser(test_conf.PIPFILE_CONFIG)
+        assert parser.filter('sample-package', '*')
+        assert len(parser.filter('sample-package', '*')) == 2
+
+        assert len(parser.filter('drf-metadata', '*')) == 1
+        assert not parser.filter('drf-metadata', '1.1.1.1.1')
+
+
+# noinspection PyMethodMayBeStatic,PyProtectedMember
+class PipfileReplacerTest:
     def test_init(self):
-        replacer = PipfileReplacer()
-        print(replacer)
+        assert PipfileReplacer()
 
     def test_match(self):
         replacer = PipfileReplacer()

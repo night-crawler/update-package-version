@@ -52,6 +52,7 @@ python-Levenshtein = "*"
 uWSGI = "*"
 
 [dev-packages]
+sample-package = {git = "https://secret-token@github.com/some-user/sample-package.git", editable = true, ref = "0.3.0"}
 
 [requires]
 python_version = "3.6"

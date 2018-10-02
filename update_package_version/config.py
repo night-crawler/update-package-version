@@ -3,8 +3,8 @@ from pathlib import Path
 
 from yaml import safe_dump, safe_load
 
+from update_package_version.base import BaseReplacer, import_replacer
 from update_package_version.constants import DEFAULT_PYTHON_CONFIG
-from update_package_version.replacers.base import BaseReplacer, import_replacer
 
 
 class FilePattern:
