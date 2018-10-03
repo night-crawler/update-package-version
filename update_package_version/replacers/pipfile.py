@@ -22,7 +22,7 @@ class PipfilePackageReplacement(BaseReplacementResult):
         self.path = path
 
     def __str__(self):
-        return f'{self.path} {self.left.strip()} -> {self.right}'
+        return f'{self.path} {self.left} -> {self.right}'
 
     def __repr__(self):
         return self.__str__()
@@ -75,9 +75,10 @@ class PipfilePackage:
             })
             return version_bundle
 
-        return f'{self.sign}{self.version}'
+        sign = self.sign or '=='
+        return f'{sign}{self.version}'
 
-    def update_version(self, new_version: str):
+    def set_version(self, new_version: str):
         self.version = new_version
         return self.get_version()
 
@@ -169,7 +170,7 @@ class PipfileParser:
         for package in self.filter(package_name, src_version):
             old_version = package.version
 
-            new_version = package.update_version(trg_version)
+            new_version = package.set_version(trg_version)
             self._data[package.section][package.name] = new_version
             replacements.append(PipfilePackageReplacement(
                 left=old_version,

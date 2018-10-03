@@ -50,7 +50,6 @@ class PipfilePackagePTest:
     def test_init(self):
         assert PipfilePackage('sample-package', 'dev-packages')
         assert PipfilePackage('sample', version='*', section='dev-packages')
-        assert str(PipfileParser('sample'))
         assert PipfilePackage('sample-package', section='packages', version='*').version == '*'
 
     def test_is_repo(self, sample_repo_package: PipfilePackage, sample_regular_package: PipfilePackage):
@@ -61,11 +60,11 @@ class PipfilePackagePTest:
         assert sample_repo_package.get_version() == sample_repo_package.raw_version
 
     def test_update_version(self, sample_repo_package: PipfilePackage, sample_regular_package: PipfilePackage):
-        updated_version = sample_repo_package.update_version('2.2.2')
+        updated_version = sample_repo_package.set_version('2.2.2')
         assert updated_version['ref'] == '2.2.2'
         assert sample_repo_package.version == '2.2.2'
 
-        updated_version = sample_regular_package.update_version('3.3.3')
+        updated_version = sample_regular_package.set_version('3.3.3')
         assert updated_version == '>=3.3.3'
         assert sample_regular_package.version == '3.3.3'
 
@@ -112,6 +111,10 @@ class PipfileReplacerTest:
 
         replacements = replacer.replace(sample_pipfile, 'sample-package', '*', '1.1.1')
         assert len(replacements) == 2
+
+        replacements = replacer.replace(sample_pipfile, 'graypy', '*', '1.1.1')
+        assert len(replacements) == 1
+        assert replacements[0].right == '==1.1.1'
 
     def teardown(self):
         pattern = test_conf.TMP_DIR.glob(f'{test_conf.TMP_CONFIG_PREFIX}*')

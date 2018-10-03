@@ -23,7 +23,7 @@ class LineReplacement(BaseReplacementResult):
         self.path = path
 
     def __str__(self):
-        return f'{self.path}:{self.line_num} {self.left.strip()} -> {self.right.strip()}'
+        return f'{self.path}:{self.line_num+1} {self.left.strip()} -> {self.right.strip()}'
 
     def __repr__(self):
         return self.__str__()
