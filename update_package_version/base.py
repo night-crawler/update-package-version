@@ -11,12 +11,6 @@ class BaseReplacementResult:
 
 
 class BaseReplacerMatchBundle:
-    def __init__(
-            self,
-            **kwargs
-    ):
-        raise NotImplementedError()
-
     def __str__(self):
         raise NotImplementedError()
 
@@ -32,9 +26,6 @@ class BaseReplacerMatchBundle:
 
 
 class BaseReplacer:
-    def __init__(self, **options):
-        raise NotImplementedError()
-
     def match(
             self,
             path: t.Union[str, Path],

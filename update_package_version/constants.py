@@ -45,7 +45,5 @@ DEFAULT_PYTHON_CONFIG = {
             'match-patterns': [PYTHON_REQUIREMENTS_GIT_RX],
             'exclude-patterns': [PYTHON_EXCLUDE_HASH_COMMENT]
         },
-
-
     ],
 }
