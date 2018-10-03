@@ -1,8 +1,8 @@
+import pytest
+
 from pathlib import Path
 from shutil import rmtree
 from tempfile import NamedTemporaryFile
-
-import pytest
 
 from update_package_version.replacers.pipfile import (
     PipfilePackage, PipfileParser, PipfileReplacer
