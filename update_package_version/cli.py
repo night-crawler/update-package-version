@@ -5,6 +5,7 @@ from shutil import get_terminal_size
 import fire
 
 from update_package_version.search import FileSearch
+from update_package_version.shell_runner import ShellRunner
 
 from .config import ConfigParser, OriginConfig
 
@@ -14,9 +15,10 @@ class UpdatePackageVersionCLI:
         self,
         config_file_path: str = None,
         config_file_name: str = '.update_package_version.yml',
+        cwd: str = str(Path.cwd())
     ):
         self._user_home_path = Path.home()
-        self._cwd = Path.cwd()
+        self._cwd = Path(cwd or Path.cwd())
 
         self._param_config_file_path = config_file_path and Path(config_file_path)
         self._cwd_config_file_path = self._cwd / config_file_name
@@ -101,9 +103,13 @@ class UpdatePackageVersionCLI:
             for file_pattern in origin.file_patterns:
                 print(f'<->\t{file_pattern}')
 
+            runner = ShellRunner(origin)
+
             fs = FileSearch(origin)
-            for match_bundle in fs.replace(package_name, src_version=src, trg_version=trg):
-                print(f'\t\t{match_bundle}')
+            for replacement in fs.replace(package_name, src_version=src, trg_version=trg):
+                print(f'\t\t{replacement}')
+                for result in runner(replacement=replacement):
+                    print(result)
 
 
 def main():

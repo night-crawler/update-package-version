@@ -1,9 +1,12 @@
 import pytest
 
 from pathlib import Path
+from shutil import copytree, rmtree
 from uuid import uuid4
 
+from tests.conf import TMP_DIR, DATA_DIR, TMP_CONFIG_PREFIX
 from update_package_version.cli import UpdatePackageVersionCLI
+
 
 pytestmark = pytest.mark.cli
 
@@ -29,3 +32,22 @@ class UpdatePackageVersionCLITest:
 
         with pytest.raises(FileExistsError):
             cli.copy_sample()
+
+    def test_find(self, cli: UpdatePackageVersionCLI):
+        cli.find('sample-package')
+
+    def test_update(self):
+        tmp_dir = TMP_DIR / f'{TMP_CONFIG_PREFIX}{uuid4().hex}'
+        copytree(DATA_DIR, tmp_dir)
+        assert tmp_dir.exists()
+
+        cli = UpdatePackageVersionCLI(cwd=tmp_dir)
+        cli.update('sample-package', trg='1.1.1', src='*')
+
+    def teardown(self):
+        pattern = TMP_DIR.glob(f'{TMP_CONFIG_PREFIX}*')
+        for path in pattern:
+            if path.is_file():
+                path.unlink()
+            else:
+                rmtree(path)
