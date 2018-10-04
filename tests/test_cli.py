@@ -24,17 +24,17 @@ class UpdatePackageVersionCLITest:
             UpdatePackageVersionCLI(config_file_path=Path('/tmp') / f'{uuid4().hex}.tmp')
 
     def test_print_settings(self, cli: UpdatePackageVersionCLI):
-        assert cli.print_settings()
+        assert all(cli.print_settings())
 
     def test_copy_sample(self, cli: UpdatePackageVersionCLI):
         cli._user_config_file_path = Path('/tmp') / f'{uuid4().hex}.tmp'
-        cli.copy_sample()
+        assert all(cli.copy_sample())
 
         with pytest.raises(FileExistsError):
-            cli.copy_sample()
+            all(cli.copy_sample())
 
     def test_find(self, cli: UpdatePackageVersionCLI):
-        cli.find('sample-package')
+        assert all(cli.find('sample-package'))
 
     def test_update(self):
         tmp_dir = TMP_DIR / f'{TMP_CONFIG_PREFIX}{uuid4().hex}'
@@ -42,7 +42,7 @@ class UpdatePackageVersionCLITest:
         assert tmp_dir.exists()
 
         cli = UpdatePackageVersionCLI(cwd=tmp_dir)
-        cli.update('sample-package', trg='1.1.1', src='*')
+        assert all(cli.update('sample-package', trg='1.1.1', src='*'))
 
     def teardown(self):
         pattern = TMP_DIR.glob(f'{TMP_CONFIG_PREFIX}*')

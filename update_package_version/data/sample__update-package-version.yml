@@ -1,36 +1,43 @@
 defaults:
   file-patterns:
-    - pattern: 'Pipfile'
+    - pattern: '**/Pipfile'
       replacer: PipfileReplacer
 
-    - pattern: 'requirements.txt'
+    - pattern: '**/requirements.txt'
       replacer: RegexReplacer
+      match-patterns:
+        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
+      exclude-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        - '^\s*#.+'
 
-    - pattern: 'requirements/*.txt'
+    - pattern: '**/requirements.txt'
       replacer: RegexReplacer
+      match-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+      exclude-patterns:
+        - '^\s*#.+'
 
-  on-update:
-    - command 1
-    - command 2
+    - pattern: '**/requirements/*.txt'
+      replacer: RegexReplacer
+      match-patterns:
+        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
+      exclude-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        - '^\s*#.+'
+
+    - pattern: '**/requirements/*.txt'
+      replacer: RegexReplacer
+      match-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+      exclude-patterns:
+        - '^\s*#.+'
 
 origins:
   - root: '/some/unreal/but/interesting/root/path'
     file-patterns:
-      - pattern: 'Pipfile'
+      - pattern: '**/Pipfile'
         replacer: PipfileReplacer
-      - pattern: 'requirements.txt'
-        replacer: RegexReplacer
-        match-patterns:
-          # regular pypi packages
-          - '^{package}==(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-          - '^{package}>=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-          - '^{package}<=(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-          - '^{package}<(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-          - '^{package}>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-          # non-pypi packages
-          - '{package}\.git@(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
-      - pattern: 'requirements/*.txt'
-        replacer: RegexReplacer
     on-update:
-      - command 1
-      - command 2
+      - echo 1
+      - echo 2

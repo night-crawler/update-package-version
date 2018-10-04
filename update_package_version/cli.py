@@ -43,13 +43,11 @@ class UpdatePackageVersionCLI:
         """
         Prints all collected runtime information.
         """
-        return [
-            f'HOME: {self._user_home_path}',
-            f'CWD: {self._cwd}',
-            f'Internal data dir: {self._data_dir}',
-            f'Default config file: {self._sample_config_file}',
-            f'Config file path: {self._config_file_path}',
-        ]
+        yield f'HOME: {self._user_home_path}'
+        yield f'CWD: {self._cwd}'
+        yield f'Internal data dir: {self._data_dir}'
+        yield f'Default config file: {self._sample_config_file}'
+        yield f'Config file path: {self._config_file_path}'
 
     def copy_sample(self):
         """
@@ -61,6 +59,7 @@ class UpdatePackageVersionCLI:
         self._user_config_file_path.write_bytes(
             self._sample_config_file.read_bytes()
         )
+        yield f'Sample has been copied to {self._user_config_file_path}'
 
     def _get_origins(self) -> t.List[OriginConfig]:
         """
@@ -79,18 +78,18 @@ class UpdatePackageVersionCLI:
         package_name: str = args[0]
 
         for origin in self._get_origins():
-            print(f'Searching for package \'{package_name}\'@{src} under {origin}')
+            yield f'Searching for package \'{package_name}\'@{src} under {origin}'
             for file_pattern in origin.file_patterns:
-                print(f'<->\t{file_pattern}')
+                yield f'<->\t{file_pattern}'
 
             fs = FileSearch(origin)
             for match_bundle in fs.find(package_name, version=src):
-                print(f'\t\t{match_bundle}')
+                yield f'\t\t{match_bundle}'
 
                 for ai in match_bundle.additional_info:
-                    print('\t\t\t', ai)
+                    yield '\t\t\t', ai
 
-            print('-' * self.terminal_width)
+            yield '-' * self.terminal_width
 
     def update(self, *args, trg: str, src: str='*'):
         if len(args) != 1:
@@ -99,17 +98,17 @@ class UpdatePackageVersionCLI:
         package_name: str = args[0]
 
         for origin in self._get_origins():
-            print(f'REPLACING package \'{package_name}\'@{src} under {origin}')
+            yield f'REPLACING package \'{package_name}\'@{src} under {origin}'
             for file_pattern in origin.file_patterns:
-                print(f'<->\t{file_pattern}')
+                yield f'<->\t{file_pattern}'
 
             runner = ShellRunner(origin)
 
             fs = FileSearch(origin)
             for replacement in fs.replace(package_name, src_version=src, trg_version=trg):
-                print(f'\t\t{replacement}')
+                yield f'\t\t{replacement}'
                 for result in runner(replacement=replacement):
-                    print(result)
+                    yield result
 
 
 def main():

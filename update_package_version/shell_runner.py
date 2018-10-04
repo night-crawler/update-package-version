@@ -30,7 +30,8 @@ class ShellRunner:
             return []
 
         results = []
-        env = env or os.environ
+        env = env or os.environ.copy()
+        env['UPV_PATH'] = replacement.path
         for command in self.origin.on_update:
             results.append(self.run_single_cmd(command, env, self.origin.root))
 
