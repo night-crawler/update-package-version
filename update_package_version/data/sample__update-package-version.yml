@@ -1,74 +1,69 @@
+######################################
+# CONVENIENCE PYTHON PACKAGE ALIASES #
+######################################
+.RE:
+    # matches `sample-package` and `sample-package==0.0.1`
+    .package: &include-package '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
+
+    # matches `sample-package.git@0.0.1`
+    .git-package: &include-git-package '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+
+    .EXCLUDE:
+        # matches all the lines start with the hash character
+        .no-comment: &no-comment '^\s*#.+'
+
+        # just aliasing `*include-git-package` to make it more readable across the config file
+        .no-git-package: &no-git-package '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+
+########################################
+# SOME USEFUL PYTHON PATTERN TEMPLATES #
+########################################
+.GENERIC-PATTERNS:
+    # use these lines along with something like `pattern: '**/requirements.txt'`
+    .generic-requirements-package: &generic-requirements-package
+        replacer: RegexReplacer
+        # AND logic is used here
+        include-patterns: []
+        # OR logic is used here
+        match-patterns:
+            - *include-package
+        # OR logic is used here
+        exclude-patterns:
+            - *no-git-package
+            - *no-comment
+
+    .git-repo-requirements-package: &git-repo-requirements-package
+        replacer: RegexReplacer
+        match-patterns:
+            - *include-git-package
+        exclude-patterns:
+            - *no-comment
+
 defaults:
-  file-patterns:
+  file-patterns: &default-file-patterns
+    # Generic Pipfile parser
     - pattern: '**/Pipfile'
       replacer: PipfileReplacer
 
+    # an utterly broad glob pattern for everything that looks like a python package file,
+    # but NOT a .git repo
     - pattern: '**/requirements.txt'
-      replacer: RegexReplacer
-      match-patterns:
-        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
-      exclude-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        - '^\s*#.+'
+      <<: *generic-requirements-package
 
+    # and this one for .git repo ONLY
     - pattern: '**/requirements.txt'
-      replacer: RegexReplacer
-      match-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-      exclude-patterns:
-        - '^\s*#.+'
+      <<: *git-repo-requirements-package
+
+    # ... when you love segmentation too much
+    - pattern: '**/requirements/*.txt'
+      <<: *generic-requirements-package
 
     - pattern: '**/requirements/*.txt'
-      replacer: RegexReplacer
-      match-patterns:
-        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
-      exclude-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        - '^\s*#.+'
-
-    - pattern: '**/requirements/*.txt'
-      replacer: RegexReplacer
-      match-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-      exclude-patterns:
-        - '^\s*#.+'
+      <<: *git-repo-requirements-package
 
 origins:
   - root: '/tmp/sample-project-group'
-    file-patterns:
-      - pattern: '**/Pipfile'
-        replacer: PipfileReplacer
-
-      - pattern: '**/requirements.txt'
-        replacer: RegexReplacer
-        match-patterns:
-        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
-        exclude-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        - '^\s*#.+'
-
-      - pattern: '**/requirements.txt'
-        replacer: RegexReplacer
-        match-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        exclude-patterns:
-        - '^\s*#.+'
-
-      - pattern: '**/requirements/*.txt'
-        replacer: RegexReplacer
-        match-patterns:
-        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
-        exclude-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        - '^\s*#.+'
-
-      - pattern: '**/requirements/*.txt'
-        replacer: RegexReplacer
-        match-patterns:
-        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
-        exclude-patterns:
-        - '^\s*#.+'
-
+    file-patterns: *default-file-patterns
     on-update:
-      - echo 1
-      - echo 2
+      - echo LOL LOL LOL
+      - echo COOL COOL COOL
