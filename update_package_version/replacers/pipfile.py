@@ -107,6 +107,9 @@ class PipfileReplacerMatchBundle(BaseReplacerMatchBundle):
     def __repr__(self):
         return self.__str__()
 
+    def __bool__(self):
+        return bool(self.matches)
+
     @property
     def additional_info(self):
         lines = []
@@ -195,10 +198,14 @@ class PipfileReplacer(BaseReplacer):
         match_bundles = []
         parser = PipfileParser(path)
 
+        pipfile_packages = parser.filter(package_name, version)
+        if not pipfile_packages:
+            return []
+
         match_bundles.append(PipfileReplacerMatchBundle(
             replacer=self,
             path=path,
-            matches=parser.filter(package_name, version),
+            matches=pipfile_packages,
             lookup_package_name=package_name,
             lookup_package_version=version
         ))

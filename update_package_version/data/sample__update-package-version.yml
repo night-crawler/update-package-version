@@ -34,10 +34,41 @@ defaults:
         - '^\s*#.+'
 
 origins:
-  - root: '/some/unreal/but/interesting/root/path'
+  - root: '/tmp/sample-project-group'
     file-patterns:
       - pattern: '**/Pipfile'
         replacer: PipfileReplacer
+
+      - pattern: '**/requirements.txt'
+        replacer: RegexReplacer
+        match-patterns:
+        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
+        exclude-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        - '^\s*#.+'
+
+      - pattern: '**/requirements.txt'
+        replacer: RegexReplacer
+        match-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        exclude-patterns:
+        - '^\s*#.+'
+
+      - pattern: '**/requirements/*.txt'
+        replacer: RegexReplacer
+        match-patterns:
+        - '(?P<package>{package})(?P<sign>\=\=|\<\=|\>\=|\<|\>)?(?P<version>[\-\d\.]+)?'
+        exclude-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        - '^\s*#.+'
+
+      - pattern: '**/requirements/*.txt'
+        replacer: RegexReplacer
+        match-patterns:
+        - '(?P<package>{package})\.git@(?P<version>[\-\d\.]+)'
+        exclude-patterns:
+        - '^\s*#.+'
+
     on-update:
       - echo 1
       - echo 2

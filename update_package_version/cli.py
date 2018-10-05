@@ -39,6 +39,9 @@ class UpdatePackageVersionCLI:
 
         self.terminal_width, self.terminal_height = get_terminal_size((80, 20))
 
+    def __str__(self):
+        return 'Package Update Command Line Interface'
+
     def print_settings(self):
         """
         Prints all collected runtime information.
@@ -87,7 +90,7 @@ class UpdatePackageVersionCLI:
                 yield f'\t\t{match_bundle}'
 
                 for ai in match_bundle.additional_info:
-                    yield '\t\t\t', ai
+                    yield f'\t\t\t{ai}'
 
             yield '-' * self.terminal_width
 
