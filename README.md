@@ -1,3 +1,45 @@
+# UPDATE PACKAGE VERSION
+
+This package provides a python executable that delivers a path-wide version bump feature.
+It reads `~/.update-package-version.yml` file for root paths from which it should start its recursive package search.
+
+Package versions are updated using these glob patterns by default:
+ - `**/Pipfile`
+ - `**/requirements.txt`
+ - `requirements/**.txt`
+
+
+## Installation
+
+```bash
+pip install update-package-version
+```    
+
+## Usage
+
+```bash
+./upv.py -- --help
+
+# upv.py [CONFIG_FILE_PATH] [CONFIG_FILE_NAME] [CWD]
+# upv.py [--config-file-path CONFIG_FILE_PATH] [--config-file-name CONFIG_FILE_NAME] [--cwd CWD]
+
+```
+
+```bash
+# You can use update-package-version command
+# or upv shortcut
+upv find package-name --src 0.0.1
+upv find package-name
+upv update package-name --src 0.0.1 --trg 1.1.1
+
+# Assumes src == *
+upv update package-name --trg 1.1.1
+
+```
+
+## Configuration
+
+```yaml
 ######################################
 # CONVENIENCE PYTHON PACKAGE ALIASES #
 ######################################
@@ -67,3 +109,5 @@ origins:
     on-update:
       - echo LOL LOL LOL
       - echo COOL COOL COOL
+
+```

@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
 from update_package_version import __version__
 
-with open('README.rst', 'r') as f:
-    long_description = f.read()
+try:
+    import pypandoc as pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+    long_description = ''
 
 setup(
     name='update-package-version',
